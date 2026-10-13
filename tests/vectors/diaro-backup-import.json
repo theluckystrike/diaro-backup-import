@@ -1,0 +1,689 @@
+{
+ "slug": "diaro-backup-import",
+ "module": "diaro-backup-import/src/parser",
+ "function": "inspectXml",
+ "note": "Model function cases name their export. Each case is run by tests/vectors.test.ts.",
+ "cases": [
+  {
+   "name": "plain entry retains text and source ID",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "empty entries table gives no entries",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"></table></backup>"
+   ],
+   "expected": {
+    "entries": [],
+    "warnings": []
+   }
+  },
+  {
+   "name": "UTC midnight uses a UTC date",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>1725147000000</date><title>Hello</title><text>A journal entry.</text><tz_offset>-420</tz_offset></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "1725147000000",
+      "day": "2024-08-31",
+      "timeFields": {
+       "date": "1725147000000",
+       "tz_offset": "-420"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "folder IDs join to titles",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_folders\"><row><uid>f1</uid><title>Travel</title></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text><folder_uid>f1</folder_uid></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "Travel",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "comma separated tag IDs join and remove duplicates",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_tags\"><row><uid>t1</uid><title>Travel</title></row><row><uid>t2</uid><title>Family</title></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text><tags> t1, t2,t1, </tags></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [
+       "Travel",
+       "Family"
+      ],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "mood ID joins to title",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_moods\"><row><uid>m1</uid><title>Happy</title></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text><mood_uid>m1</mood_uid></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "Happy",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "location retains source coordinates",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_locations\"><row><uid>l1</uid><lat>10.5</lat><lng>106.1</lng><title>Garden</title></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text><location_uid>l1</location_uid></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {
+       "uid": "l1",
+       "lat": "10.5",
+       "lng": "106.1",
+       "title": "Garden"
+      },
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "photo records join by entry ID",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_attachments\"><row><entry_uid>e1</entry_uid><type>photo</type><filename>walk.jpg</filename></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": [
+       "media/photo/walk.jpg"
+      ]
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "duplicate photo references give one photo",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_attachments\"><row><entry_uid>e1</entry_uid><type>photo</type><filename>walk.jpg</filename></row><row><entry_uid>e1</entry_uid><type>photo</type><filename>walk.jpg</filename></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": [
+       "media/photo/walk.jpg"
+      ]
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "XML entities become text",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>Tea &amp; cake &lt;3</text></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "Tea & cake <3",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "CDATA retains source HTML",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text><![CDATA[<p>Walk <b>outside</b></p>]]></text></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "<p>Walk <b>outside</b></p>",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "unknown tag ID gives a warning",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text><tags>missing</tags></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": [
+     "Entry e1: missing tag ID missing."
+    ]
+   }
+  },
+  {
+   "name": "unknown folder ID gives a warning",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text><folder_uid>missing</folder_uid></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": [
+     "Entry e1: missing folder ID missing."
+    ]
+   }
+  },
+  {
+   "name": "unknown mood and location IDs give warnings",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text><mood_uid>missing</mood_uid><location_uid>missing</location_uid></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": [
+     "Entry e1: missing location ID missing.",
+     "Entry e1: missing mood ID missing."
+    ]
+   }
+  },
+  {
+   "name": "time fields retain their original strings",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text><date_created>001</date_created><date_modified>123</date_modified><tz_offset>+420</tz_offset></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0",
+       "date_created": "001",
+       "date_modified": "123",
+       "tz_offset": "+420"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "blank titles and text stay blank",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "",
+      "text": "",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "dates before 1970 are supported",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>-86400000</date><title>Hello</title><text>A journal entry.</text></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "-86400000",
+      "day": "1969-12-31",
+      "timeFields": {
+       "date": "-86400000"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "unsupported backup version is rejected",
+   "args": [
+    "<backup version=\"1\"/>"
+   ],
+   "expected": {
+    "error": "Select a version 2 Diaro backup."
+   }
+  },
+  {
+   "name": "missing entries table is rejected",
+   "args": [
+    "<backup version=\"2\"/>"
+   ],
+   "expected": {
+    "error": "The backup has no diaro_entries table."
+   }
+  },
+  {
+   "name": "missing source ID is rejected",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><date>0</date></row></table></backup>"
+   ],
+   "expected": {
+    "error": "An entry has no valid source ID."
+   }
+  },
+  {
+   "name": "duplicate entry IDs are rejected",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date></row><row><uid>e1</uid><date>0</date></row></table></backup>"
+   ],
+   "expected": {
+    "error": "Duplicate entry ID: e1."
+   }
+  },
+  {
+   "name": "invalid dates are rejected",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_entries\"><row><uid>e1</uid><date>yesterday</date></row></table></backup>"
+   ],
+   "expected": {
+    "error": "Entry e1 has an invalid date."
+   }
+  },
+  {
+   "name": "XML document types are rejected",
+   "args": [
+    "<!DOCTYPE backup><backup version=\"2\"/>"
+   ],
+   "expected": {
+    "error": "XML document types and entities are not supported."
+   }
+  },
+  {
+   "name": "photo parent paths are rejected",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_attachments\"><row><entry_uid>e1</entry_uid><type>photo</type><filename>../walk.jpg</filename></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text></row></table></backup>"
+   ],
+   "expected": {
+    "error": "A photo record has an unsafe path or unsupported file type."
+   }
+  },
+  {
+   "name": "duplicate metadata IDs are rejected",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_tags\"><row><uid>t1</uid><title>A</title></row><row><uid>t1</uid><title>B</title></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text></row></table></backup>"
+   ],
+   "expected": {
+    "error": "Duplicate ID in diaro_tags: t1."
+   }
+  },
+  {
+   "name": "non photo attachments give a warning",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_attachments\"><row><entry_uid>e1</entry_uid><type>audio</type><filename>walk.mp3</filename></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": [
+     "Attachment type not copied: audio."
+    ]
+   }
+  },
+  {
+   "name": "unknown tables do not change entries",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_templates\"><row><uid>template1</uid><title>Daily</title></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "name": "photo records without an entry give a warning",
+   "args": [
+    "<backup version=\"2\"><table name=\"diaro_attachments\"><row><entry_uid>other</entry_uid><type>photo</type><filename>walk.jpg</filename></row></table><table name=\"diaro_entries\"><row><uid>e1</uid><date>0</date><title>Hello</title><text>A journal entry.</text></row></table></backup>"
+   ],
+   "expected": {
+    "entries": [
+     {
+      "id": "e1",
+      "title": "Hello",
+      "text": "A journal entry.",
+      "date": "0",
+      "day": "1970-01-01",
+      "timeFields": {
+       "date": "0"
+      },
+      "folder": "",
+      "tags": [],
+      "mood": "",
+      "location": {},
+      "photos": []
+     }
+    ],
+    "warnings": [
+     "Photo record has no entry: other."
+    ]
+   }
+  },
+  {
+   "name": "file names remove reserved characters",
+   "function": "safeSegment",
+   "args": [
+    "Rain / sun: walk"
+   ],
+   "expected": "Rain - sun- walk"
+  },
+  {
+   "name": "Windows reserved file names get a prefix",
+   "function": "safeSegment",
+   "args": [
+    "CON"
+   ],
+   "expected": "_CON"
+  },
+  {
+   "name": "empty file names use a fallback",
+   "function": "safeSegment",
+   "args": [
+    "..."
+   ],
+   "expected": "Untitled"
+  },
+  {
+   "name": "later backup reports new changed unchanged and absent IDs",
+   "function": "compareSources",
+   "args": [
+    [
+     {
+      "id": "new",
+      "hash": "1",
+      "path": "new.md"
+     },
+     {
+      "id": "changed",
+      "hash": "2",
+      "path": "changed.md"
+     },
+     {
+      "id": "same",
+      "hash": "3",
+      "path": "same.md"
+     }
+    ],
+    [
+     {
+      "id": "changed",
+      "hash": "1",
+      "path": "old.md"
+     },
+     {
+      "id": "same",
+      "hash": "3",
+      "path": "same.md"
+     },
+     {
+      "id": "absent",
+      "hash": "4",
+      "path": "absent.md"
+     }
+    ]
+   ],
+   "expected": {
+    "added": [
+     "new"
+    ],
+    "changed": [
+     "changed"
+    ],
+    "unchanged": [
+     "same"
+    ],
+    "absent": [
+     "absent"
+    ]
+   }
+  }
+ ]
+}

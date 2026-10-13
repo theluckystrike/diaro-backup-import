@@ -1,0 +1,44 @@
+.diaro-import-modal {
+  width: min(860px, 95vw);
+}
+
+.diaro-import {
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.diaro-import .setting-item {
+  padding: 10px 0;
+}
+
+.diaro-import summary {
+  cursor: pointer;
+  padding: 8px 0;
+  color: var(--text-muted);
+}
+
+.diaro-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-ui-small);
+}
+
+.diaro-table th, .diaro-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--background-modifier-border);
+  overflow-wrap: anywhere;
+}
+
+.diaro-counts {
+  color: var(--text-accent);
+  font-weight: var(--font-semibold);
+}
+
+.diaro-status {
+  padding: 12px 0;
+}
+
+.diaro-picker {
+  max-width: 280px;
+}

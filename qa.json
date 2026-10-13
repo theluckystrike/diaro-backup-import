@@ -1,0 +1,76 @@
+[
+  {
+    "feature": "preview",
+    "caption": "The preview shows three entries and one missing photo.",
+    "note": "Start here.md",
+    "eval": "(async()=>{{app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};let token='gho_'+'0'.repeat(36); p.pro.opts.tokens.get=()=>token; p.pro.opts.tokens.set=(v)=>{token=v;}; p.pro.opts.tokens.clear=()=>{token=null;}; p.pro.opts.http=async()=>({status:200,json:{data:{viewer:{login:'demo-reader',totalSponsorshipAmountAsSponsorInCents:1500},user:{viewerIsSponsoring:true,sponsorshipForViewerAsSponsor:{isActive:true,isOneTimePayment:false,tier:{name:'$5 a month',monthlyPriceInCents:500}}}}}}); await p.pro.refreshNow();await p.importPlan(await p.prepare(b,'Diaro demo',p.settings.mapping),true); p.pro.signOut();}app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};p.pro.signOut(); const m=p.openImport(b); await m.refreshPreview(); m.contentEl.scrollTop=0; return '3 entries, 1 photo, 1 missing photo';})()",
+    "zoom": 0.85,
+    "wait": 900,
+    "after": "app.plugins.plugins['diaro-backup-import'].closeImportWindows(); app.plugins.plugins['diaro-backup-import'].pro.signOut(); 'ok'"
+  },
+  {
+    "feature": "metadata",
+    "caption": "The imported note has source properties and tags.",
+    "eval": "(async()=>{app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};let token='gho_'+'0'.repeat(36); p.pro.opts.tokens.get=()=>token; p.pro.opts.tokens.set=(v)=>{token=v;}; p.pro.opts.tokens.clear=()=>{token=null;}; p.pro.opts.http=async()=>({status:200,json:{data:{viewer:{login:'demo-reader',totalSponsorshipAmountAsSponsorInCents:1500},user:{viewerIsSponsoring:true,sponsorshipForViewerAsSponsor:{isActive:true,isOneTimePayment:false,tier:{name:'$5 a month',monthlyPriceInCents:500}}}}}}); await p.pro.refreshNow();await p.importPlan(await p.prepare(b,'Diaro demo',p.settings.mapping),true); p.pro.signOut();await app.workspace.getLeaf(false).openFile(app.vault.getFileByPath('Diaro demo/2024-09-01 Morning garden walk -- walk-01.md'),{state:{mode:'preview'}}); return 'source metadata and note';})()",
+    "zoom": 0.85,
+    "wait": 900,
+    "after": "app.plugins.plugins['diaro-backup-import'].closeImportWindows(); app.plugins.plugins['diaro-backup-import'].pro.signOut(); 'ok'"
+  },
+  {
+    "feature": "photos",
+    "caption": "The imported note embeds a local garden image.",
+    "eval": "(async()=>{app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};p.pro.signOut(); await app.workspace.getLeaf(false).openFile(app.vault.getFileByPath('Diaro demo/2024-09-01 Morning garden walk -- walk-01.md'),{state:{mode:'preview'}}); app.workspace.getLeaf(false).view.containerEl.querySelector('.markdown-preview-view').scrollTop=350; return 'local garden image';})()",
+    "zoom": 0.85,
+    "wait": 900,
+    "after": "app.plugins.plugins['diaro-backup-import'].closeImportWindows(); app.plugins.plugins['diaro-backup-import'].pro.signOut(); 'ok'"
+  },
+  {
+    "feature": "presets",
+    "caption": "A saved mapping preset has custom property names.",
+    "eval": "(async()=>{app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};let token='gho_'+'0'.repeat(36); p.pro.opts.tokens.get=()=>token; p.pro.opts.tokens.set=(v)=>{token=v;}; p.pro.opts.tokens.clear=()=>{token=null;}; p.pro.opts.http=async()=>({status:200,json:{data:{viewer:{login:'demo-reader',totalSponsorshipAmountAsSponsorInCents:1500},user:{viewerIsSponsoring:true,sponsorshipForViewerAsSponsor:{isActive:true,isOneTimePayment:false,tier:{name:'$5 a month',monthlyPriceInCents:500}}}}}}); await p.pro.refreshNow();p.settings.mapping={...p.settings.mapping,titleProperty:'subject',folderProperty:'journal',moodProperty:'mood'}; await p.savePreset('Journal properties',p.settings.mapping); const m=p.openImport(b); await m.refreshPreview(); m.contentEl.querySelectorAll('details').forEach((el)=>{el.open=true;}); m.contentEl.scrollTop=160; return 'saved mapping preset';})()",
+    "zoom": 0.85,
+    "wait": 900,
+    "after": "app.plugins.plugins['diaro-backup-import'].closeImportWindows(); app.plugins.plugins['diaro-backup-import'].pro.signOut(); 'ok'"
+  },
+  {
+    "feature": "compare",
+    "caption": "A later backup has one changed entry and two unchanged entries.",
+    "eval": "(async()=>{app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};let token='gho_'+'0'.repeat(36); p.pro.opts.tokens.get=()=>token; p.pro.opts.tokens.set=(v)=>{token=v;}; p.pro.opts.tokens.clear=()=>{token=null;}; p.pro.opts.http=async()=>({status:200,json:{data:{viewer:{login:'demo-reader',totalSponsorshipAmountAsSponsorInCents:1500},user:{viewerIsSponsoring:true,sponsorshipForViewerAsSponsor:{isActive:true,isOneTimePayment:false,tier:{name:'$5 a month',monthlyPriceInCents:500}}}}}}); await p.pro.refreshNow();b.entries[0].text+=' Added to the later backup.'; const m=p.openImport(b); await m.refreshPreview(); const button=Array.from(m.contentEl.querySelectorAll('button')).find((el)=>el.textContent==='Compare backup (Pro)'); if(button.disabled) throw new Error('Comparison is disabled'); button.click(); m.contentEl.scrollTop=m.contentEl.scrollHeight; return '1 changed, 2 unchanged';})()",
+    "zoom": 0.85,
+    "wait": 900,
+    "after": "app.plugins.plugins['diaro-backup-import'].closeImportWindows(); app.plugins.plugins['diaro-backup-import'].pro.signOut(); 'ok'"
+  },
+  {
+    "feature": "reviews",
+    "caption": "The monthly review has links to the two September entries.",
+    "eval": "(async()=>{app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};p.pro.signOut(); const review=app.vault.getFileByPath('Diaro demo/reviews/2024-09 Diaro review.md'); if(!review) throw new Error('Review missing'); await app.workspace.getLeaf(false).openFile(review,{state:{mode:'preview'}}); return 'September review';})()",
+    "zoom": 0.85,
+    "wait": 900,
+    "after": "app.plugins.plugins['diaro-backup-import'].closeImportWindows(); app.plugins.plugins['diaro-backup-import'].pro.signOut(); 'ok'"
+  },
+  {
+    "feature": "import-flow",
+    "caption": "Preview the journal, then read its imported note and monthly review.",
+    "zoom": 0.85,
+    "frames": [
+      {
+        "note": "Start here.md",
+        "eval": "(async()=>{app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};p.pro.signOut(); const m=p.openImport(b); await m.refreshPreview(); m.contentEl.scrollTop=0; return '3 entries, 1 photo, 1 missing photo';})()",
+        "hold": 1800
+      },
+      {
+        "eval": "(async()=>{app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};let token='gho_'+'0'.repeat(36); p.pro.opts.tokens.get=()=>token; p.pro.opts.tokens.set=(v)=>{token=v;}; p.pro.opts.tokens.clear=()=>{token=null;}; p.pro.opts.http=async()=>({status:200,json:{data:{viewer:{login:'demo-reader',totalSponsorshipAmountAsSponsorInCents:1500},user:{viewerIsSponsoring:true,sponsorshipForViewerAsSponsor:{isActive:true,isOneTimePayment:false,tier:{name:'$5 a month',monthlyPriceInCents:500}}}}}}); await p.pro.refreshNow();await p.importPlan(await p.prepare(b,'Diaro demo',p.settings.mapping),true); p.pro.signOut();await app.workspace.getLeaf(false).openFile(app.vault.getFileByPath('Diaro demo/2024-09-01 Morning garden walk -- walk-01.md'),{state:{mode:'preview'}}); return 'source metadata and note';})()",
+        "hold": 1800
+      },
+      {
+        "eval": "(async()=>{app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};p.pro.signOut(); await app.workspace.getLeaf(false).openFile(app.vault.getFileByPath('Diaro demo/2024-09-01 Morning garden walk -- walk-01.md'),{state:{mode:'preview'}}); app.workspace.getLeaf(false).view.containerEl.querySelector('.markdown-preview-view').scrollTop=350; return 'local garden image';})()",
+        "hold": 1800
+      },
+      {
+        "eval": "(async()=>{app.plugins.plugins['diaro-backup-import'].closeImportWindows(); const p=app.plugins.plugins['diaro-backup-import']; const f=app.vault.getFileByPath('Diaro Backup Import/Demo backup.zip'); const b=p.readBackup(new Uint8Array(await app.vault.readBinary(f))); p.settings.folder='Diaro demo'; p.settings.mapping={noteName:'date-title',titleProperty:'title',folderProperty:'diaro_folder',moodProperty:'diaro_mood',tagsProperty:'tags'};p.pro.signOut(); const review=app.vault.getFileByPath('Diaro demo/reviews/2024-09 Diaro review.md'); if(!review) throw new Error('Review missing'); await app.workspace.getLeaf(false).openFile(review,{state:{mode:'preview'}}); return 'September review';})()",
+        "hold": 1800
+      }
+    ],
+    "after": "app.plugins.plugins['diaro-backup-import'].closeImportWindows(); app.plugins.plugins['diaro-backup-import'].pro.signOut(); 'ok'"
+  }
+]
