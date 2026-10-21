@@ -71,6 +71,8 @@ Existing source IDs in the destination folder are skipped, including notes moved
 
 ## Settings
 
+After a minor or major update, this plugin opens one What's new tab in the background. The tab and settings card suggest other NoteMods plugins and Zovo Chat and link to notemods.com for feedback ([privacy](https://notemods.com/privacy/)). The tab sends no data. Turn the tab off in Settings.
+
 The settings tab sets the default import folder and contains the GitHub Sponsors controls. The import window has the destination folder, note name format, property mapping and Pro options. A completed import saves its folder and mapping for the next run. Named presets are stored in the plugin's local settings file.
 
 ## FAQ

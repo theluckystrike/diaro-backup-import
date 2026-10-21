@@ -3,6 +3,7 @@ import { sponsorsSettingItems } from './license/github-obsidian';
 import { DEFAULT_MAPPING, safeFolder, validateMapping, type Mapping } from './model';
 import { PRO_UI } from './pro';
 import type DiaroBackupImportPlugin from './main';
+import { helloSettingItems } from './hello/settings';
 
 export interface Preset { name: string; mapping: Mapping }
 export interface DiaroBackupImportSettings { folder: string; mapping: Mapping; presets: Preset[] }
@@ -30,6 +31,11 @@ export function normalizeSettings(saved: unknown): DiaroBackupImportSettings {
 export class DiaroBackupImportSettingTab extends PluginSettingTab {
 	constructor(app: ConstructorParameters<typeof PluginSettingTab>[0], readonly plugin: DiaroBackupImportPlugin) { super(app, plugin); }
 	getSettingDefinitions(): SettingDefinitionItem[] {
+		// The product rows, then the "More from NoteMods" card (packages/hello).
+		return [...this.productSettingDefinitions(), ...helloSettingItems()];
+	}
+
+	productSettingDefinitions(): SettingDefinitionItem[] {
 		return [
 			{ name: 'Import folder', desc: 'Default folder for new notes, photos and reviews. You can change it in the import window.', control: { type: 'text', key: 'folder', defaultValue: DEFAULT_SETTINGS.folder } },
 			...(this.plugin.pro ? sponsorsSettingItems(this.plugin.pro, PRO_UI) : []),
