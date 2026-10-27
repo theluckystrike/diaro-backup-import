@@ -10,7 +10,7 @@ import { bindPro, resetPro, SPONSORS } from '../src/pro';
 import manifest from '../manifest.json';
 const fixture=()=>readBackup(new Uint8Array(readFileSync('tests/fixtures/sample.zip')));
 function setup(files: Record<string,string>={}) { const app=App.createConfigured__({files});const plugin=new DiaroBackupImportPlugin(app as never,manifest as never);return {app,plugin}; }
-function pro(value:boolean) { bindPro({isPro:()=>value,onChange:()=>()=>undefined} as never); }
+function pro(value:boolean) { bindPro({isPro:()=>value,getState: () => ({ status: 'signed-out', lastAttemptAt: 0 }), hasToken: () => false, config: { sponsorLogin: 'theluckystrike' }, onChange:()=>()=>undefined} as never); }
 afterEach(()=>resetPro());
 describe('vault import and Pro access',()=>{
 	it('loads and repairs saved settings',async()=>{const {plugin}=setup();await plugin.loadSettings();expect(plugin.settings).toEqual(DEFAULT_SETTINGS);expect(normalizeSettings({folder:'../x',mapping:{titleProperty:'diaro_uid'}})).toEqual(DEFAULT_SETTINGS);expect(normalizeSettings(null)).toEqual(DEFAULT_SETTINGS);});

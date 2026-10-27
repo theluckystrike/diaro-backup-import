@@ -53,7 +53,8 @@ describe('Diaro Backup Import in real Obsidian',function(){
 		await browser.waitUntil(async()=>(await browser.$('.diaro-status').getText()).includes('Preview ready'),{timeout:20000,timeoutMsg:'Import preview did not finish'});
 		expect(await browser.$('.diaro-counts').getText()).toContain('3 entries');
 		expect(await browser.$('.diaro-counts').getText()).toContain('1 missing photos');
-		expect(await browser.$('button=Compare backup (Pro)').isEnabled()).toBe(false);
+		// Free users can select Compare backup: the select shows the Pro notice (test/e2e/pro-notice.e2e.ts).
+		expect(await browser.$('button=Compare backup (Pro)').isEnabled()).toBe(true);
 		await browser.$('button=Create notes').click();
 		await browser.waitUntil(async()=>(await browser.$('.diaro-status').getText()).includes('3 notes created'),{timeout:20000,timeoutMsg:'Import did not finish'});
 		const output=await browser.executeObsidian(async({app})=>{

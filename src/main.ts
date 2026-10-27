@@ -1,11 +1,11 @@
 import { TEXT } from './copy';
-import { Notice, Plugin } from 'obsidian';
+import { Plugin } from 'obsidian';
 import type { SponsorsManager } from './license/index';
 import { createGitHubSponsors } from './license/github-obsidian';
 import { readBackup, type Backup } from './archive';
 import { prepareImport, writeImport, type ImportPlan, type ImportResult } from './importer';
 import { ImportModal } from './modal';
-import { SPONSORS, bindPro, isPro, resetPro } from './pro';
+import { SPONSORS, bindPro, isPro, proNotice, resetPro } from './pro';
 import { DiaroBackupImportSettingTab, normalizeSettings, type DiaroBackupImportSettings } from './settings';
 import { validateMapping, type Mapping } from './model';
 import { setupHello } from './hello/index';
@@ -60,7 +60,7 @@ export default class DiaroBackupImportPlugin extends Plugin {
 		try { return await writeImport(this.app.vault, plan, reviews); } finally { this.importing = false; }
 	}
 	async savePreset(name: string, mapping: Mapping): Promise<boolean> {
-		if (!isPro()) { new Notice(TEXT.needPreset); return false; }
+		if (!isPro()) { proNotice(TEXT.needPreset); return false; }
 		validateMapping(mapping);
 		const clean = name.trim().slice(0, 60);
 		if (!clean) throw new Error('Enter a preset name.');

@@ -1,5 +1,11 @@
 # diaro-backup-import
 
+## 1.1.1
+
+### Patch Changes
+
+- 1919298: Monthly review notes, Save preset, Use preset and Compare backup now show how to get Pro, with a Sponsor on GitHub button, when you select them. Nothing runs or saves until Pro is on.
+
 ## 1.1.0
 
 ### Minor Changes

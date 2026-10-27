@@ -3,7 +3,7 @@ import { Modal, Notice, Setting } from 'obsidian';
 import { MAX_ZIP, type Backup } from './archive';
 import { comparePlan, existingFile, type ImportPlan } from './importer';
 import { validateMapping, type Mapping } from './model';
-import { isPro } from './pro';
+import { isPro, proNotice } from './pro';
 import type DiaroBackupImportPlugin from './main';
 
 export class ImportModal extends Modal {
@@ -122,14 +122,24 @@ export class ImportModal extends Modal {
 		if (!el || this.disposed) return;
 		el.empty();
 		if (!isPro()) this.reviews = false;
-		new Setting(el).setName(TEXT.reviews).setDesc('Create a review for each month in this import. Existing reviews are kept.').addToggle((t) => t.setValue(this.reviews).setDisabled(!isPro()).onChange((value) => { this.reviews = isPro() && value; }));
+		new Setting(el).setName(TEXT.reviews).setDesc('Create a review for each month in this import. Existing reviews are kept.').addToggle((t) => t.setValue(this.reviews).onChange((value) => {
+			// A free user's select shows the Pro notice and sets the toggle back to off. setValue(false) calls this
+			// callback again with false; the !isPro() check returns before any change.
+			if (!isPro()) { if (value) { proNotice(TEXT.needReviews); t.setValue(false); } return; }
+			this.reviews = value;
+		}));
 		const details = el.createEl('details');
 		details.createEl('summary', { text: TEXT.presets });
 		let name = '';
-		new Setting(details).setName(TEXT.savePreset).addText((t) => t.setPlaceholder('Preset name').onChange((value) => { name = value; })).addButton((b) => b.setButtonText('Save preset').setDisabled(!isPro()).onClick(() => void this.run(async () => { validateMapping(this.mapping); if (await this.plugin.savePreset(name, this.mapping)) { this.updatePro(); new Notice('Mapping preset saved.'); } })));
+		new Setting(details).setName(TEXT.savePreset).addText((t) => t.setPlaceholder('Preset name').onChange((value) => { name = value; })).addButton((b) => b.setButtonText('Save preset').onClick(() => {
+			// A free user's select shows the Pro notice. No preset is saved.
+			if (!isPro()) { proNotice(TEXT.needPreset); return; }
+			void this.run(async () => { validateMapping(this.mapping); if (await this.plugin.savePreset(name, this.mapping)) { this.updatePro(); new Notice('Mapping preset saved.'); } });
+		}));
 		for (const preset of this.plugin.settings.presets) {
-			new Setting(details).setName(preset.name).addButton((b) => b.setButtonText('Use preset').setDisabled(!isPro()).onClick(() => {
-				if (!isPro()) return;
+			new Setting(details).setName(preset.name).addButton((b) => b.setButtonText('Use preset').onClick(() => {
+				// A lapsed sponsor keeps saved presets. A free user's select shows the Pro notice and loads nothing.
+				if (!isPro()) { proNotice(TEXT.needPreset); return; }
 				this.mapping = { ...preset.mapping };
 				// Reopen the modal to draw the loaded mapping without stale input values.
 				this.plugin.settings.mapping = { ...preset.mapping };
@@ -145,8 +155,10 @@ export class ImportModal extends Modal {
 		if (!el || this.disposed) return;
 		el.empty();
 		new Setting(el).addButton((b) => b.setButtonText('Preview').setDisabled(this.busy || !this.backup).onClick(() => void this.run(() => this.refreshPreview())))
-			.addButton((b) => b.setButtonText(TEXT.compare).setDisabled(this.busy || !this.plan || !isPro()).onClick(() => {
-				if (!isPro() || !this.plan) return;
+			.addButton((b) => b.setButtonText(TEXT.compare).setDisabled(this.busy || !this.plan).onClick(() => {
+				if (!this.plan) return;
+				// A free user's select shows the Pro notice. No comparison runs.
+				if (!isPro()) { proNotice(TEXT.needCompare); return; }
 				const c = comparePlan(this.plan);
 				this.message(`${c.added.length} new · ${c.changed.length} changed · ${c.unchanged.length} unchanged · ${c.absent.length} absent from backup. Existing notes stay in place.`);
 				const el = this.preview;

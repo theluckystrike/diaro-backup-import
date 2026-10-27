@@ -10,5 +10,7 @@ export const TEXT = {
   "presets": "Mapping presets (Pro)",
   "savePreset": "Save mapping preset (Pro)",
   "compare": "Compare backup (Pro)",
-  "needPreset": "Saved mapping presets need Pro. Sign in from the plugin settings."
+  "needPreset": "Saved mapping presets need Pro.",
+  "needReviews": "Monthly review notes need Pro.",
+  "needCompare": "Backup comparison needs Pro."
 };
