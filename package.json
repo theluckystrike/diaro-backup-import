@@ -1,6 +1,6 @@
 {
 	"name": "diaro-backup-import",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"private": true,
 	"description": "Import a Diaro backup with journal entries, tags, and photos.",
 	"main": "main.js",

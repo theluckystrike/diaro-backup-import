@@ -1,9 +1,9 @@
 {
 	"id": "diaro-backup-import",
 	"name": "Diaro Backup Import",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"changes": [
-		"Monthly review notes, Save preset, Use preset and Compare backup now show how to get Pro, with a Sponsor on GitHub button, when you select them. Nothing runs or saves until Pro is on."
+		"The Pro notice of Diaro Backup Import now says that one payment turns on Pro in every NoteMods plugin."
 	],
 	"tip": "Select Compare backup to count new, changed, unchanged and absent entries in a later backup.",
 	"thanks": "Hi, I am Michael, a solo developer in Poland. Diaro Backup Import is one of over 100 small plugins that I make. Thank you for moving your notes into Obsidian with it.",

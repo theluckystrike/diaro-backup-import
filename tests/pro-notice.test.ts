@@ -11,7 +11,7 @@ import manifest from '../manifest.json';
 
 // A free user can select the Pro controls of the import window. The select shows the shared Pro notice with the
 // "Sponsor on GitHub" button. No preset is saved or loaded, no comparison runs and the review toggle shows off again.
-const PITCH = 'Sponsor on GitHub, then sign in from the plugin settings.';
+const PITCH = 'One payment turns on Pro in every NoteMods plugin. Sponsor on GitHub, then sign in from the plugin settings.';
 const REVIEWS = 'Monthly review notes need Pro.';
 const PRESETS = 'Saved mapping presets need Pro.';
 const COMPARE = 'Backup comparison needs Pro.';
